@@ -102,6 +102,20 @@ def scan_flyer():
             return jsonify(event_data)
             
     return jsonify({"error": "Failed"}), 500
+# --- NEW: DELETE EVENT ROUTE ---
+@app.route('/api/events/<event_id>', methods=['DELETE'])
+def delete_event(event_id):
+    try:
+        # Convert string ID to MongoDB ObjectId
+        from bson.objectid import ObjectId
+        result = mongo.db.events.delete_one({'_id': ObjectId(event_id)})
+        
+        if result.deleted_count > 0:
+            return jsonify({"message": "Deleted"}), 200
+        else:
+            return jsonify({"error": "Event not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
